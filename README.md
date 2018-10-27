@@ -14,7 +14,7 @@ Changes it can detect include changing attribute values and adding and deleting 
 <script src="jquery-mutation-observe.js"></script>
 ```
 
-### apply plugin an element
+### apply plugin to an element
 
 ```
 $('.element')
