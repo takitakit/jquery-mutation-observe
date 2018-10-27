@@ -48,7 +48,7 @@ $('.element')
 
 ## options
 
-### monitoring changes of attributes
+### .observeAttribute
 
 | options    | type         | description                                                                                                                                                      | example  |
 |------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
@@ -56,7 +56,7 @@ $('.element')
 | selector   | string       | selector character string specifying the element to be monitored.  (relative designation from the top element) If not specify, only the top element is targeted. | > .child |
 | callback   | function     | Function to be called when a change is detected.                                                                                                                 |          |
 
-### monitoring adding and deleting nodes
+### .observeNode
 
 | options  | type     | description                                                                                                                                                                       | example  |
 |----------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
