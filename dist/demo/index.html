@@ -1,0 +1,306 @@
+<!doctype html>
+<html class="no-js" lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Mutation Observe DEMO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style type="text/css">
+        .col{
+          display: flex;
+        }
+        .col > div {
+          margin: 5px;
+        }
+        .col > .right{
+          flex-grow: 3;
+        }
+        .logs {
+          list-style-type: none;
+          margin: 15px 0 0 0;
+          padding: 0;
+          width: 100%;
+        }
+        .logs:empty {
+          display: none;
+        }
+        .logs:before{
+          content: 'log';
+          background-color: #555;
+          color: #fff;
+          padding: 5px;
+        }
+        .logs li {
+          border-bottom: 1px solid #ddd;
+          padding: 3px 0;
+        }
+        .logs li.show {
+          animation-name: show_anim;
+          animation-duration: 1.5s;
+        }
+        @keyframes show_anim {
+          0% {
+            background-color: #fff;
+          }
+          25% {
+            background-color: #ff7;
+          }
+          50% {
+            background-color: #ff7;
+          }
+          75% {
+            background-color: #ff7;
+          }
+          100% {
+            background-color: #fff;
+          }
+        }
+
+        .demo-box {
+          position: relative;
+          box-sizing: border-box;
+          border: 1px solid gray;
+          background-color: #fdd;
+          width: 500px;
+          min-height: 300px;
+          padding: 25px 5px 5px 5px;
+          border-radius: 5px;
+        }
+        .child {
+          box-sizing: border-box;
+          padding: 25px 5px 5px 5px;
+          position: relative;
+          width: 100%;
+          min-height: 80px;
+          background-color: #dfd;
+          border: 1px solid gray;
+          border-radius: 5px;
+          margin: 10px 0;
+        }
+        .grand-child {
+          box-sizing: border-box;
+          padding: 25px 5px 5px 5px;
+          position: relative;
+          width: 100%;
+          min-height: 70px;
+          background-color: #ffd;
+          border: 1px solid gray;
+          border-radius: 5px;
+          margin: 10px 0;
+        }
+        .grand-grand-child {
+          box-sizing: border-box;
+          padding: 5px;
+          position: relative;
+          width: 100%;
+          min-height: 70px;
+          background-color: #dff;
+          border: 1px solid gray;
+          border-radius: 5px;
+          margin: 10px 0;
+        }
+
+        .demo-box label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          background-color: #555;
+          color: #fff;
+          padding: 3px 5px;
+          font-size: .8rem;
+          border-bottom-right-radius: 5px;
+          border-top-left-radius: 5px;
+        }
+
+        .ctrl-box {
+          margin-top: 1rem;
+        }
+        .ctrl-box label {
+          font-weight: bold;
+          font-size: 1.1rem;
+        }
+
+        .solid-bordered {
+          border: 2px solid red!important;
+        }
+        .dashed-bordered {
+          border: 2px dashed red!important;
+        }
+
+        </style>
+    </head>
+    <body>
+      <h2>jquery-mutation-observe.js DEMO</h2>
+      <div class="col">
+        <div class="left">
+          <div class="demo-box">
+            <label>self</label>
+          </div>
+        </div>
+        <div class="right">
+          <div class="ctrl-box change-node">
+            <label>add/remove node</label><br>
+            <select class="type">
+              <option value="add">add child to</option>
+              <option value="remove">remove child from</option>
+            </select>
+            <select class="target">
+              <option value="self">self</option>
+              <option value="child">child</option>
+              <option value="grand-child">grand-child</option>
+            </select>
+            <button class="apply">apply</button>
+          </div>
+          <div class="ctrl-box change-class">
+            <label>change class</label><br>
+            set
+            <select class="class-name">
+              <option value="solid-bordered">solid border</option>
+              <option value="dashed-bordered">dashed border</option>
+            </select>
+            to
+            <select class="target">
+              <option value="self">self</option>
+              <option value="child">child</option>
+              <option value="grand-child">grand child</option>
+              <option value="grand-grand-child">grand grand child</option>
+            </select>
+            <button class="apply">apply</button>
+          </div>
+
+          <ul class="logs"></ul>
+        </div>
+
+      </div>
+
+      <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+      <script src="../jquery-mutation-observe.js"></script>
+      <script>
+      $('.demo-box')
+        // 自身のclass属性のみ監視する場合
+        .observeAttribute({
+          'attributes': 'class',
+          'callback': function(data){
+            log('attribute:class has been changed from ['+data.oldValue+'] to ['+data.newValue+'] on self');
+          }
+        })
+        // 特定の子孫要素のclass属性のみ監視する場合
+        .observeAttribute({
+          'attributes': 'class',
+          'selector': '.child',
+          'callback': function(data){
+            log('attribute:class has been changed from ['+data.oldValue+'] to ['+data.newValue+'] on a child element');
+          }
+        })
+        .observeAttribute({
+          'attributes': 'class',
+          'selector': '.child *',
+          'callback': function(data){
+            log('attribute:class has changed from ['+data.oldValue+'] to ['+data.newValue+'] on a progeny element under a child element');
+          }
+        })
+        // 自身の直下の子要素の追加・削除を監視する場合
+        .observeNode({
+          'selector': '> .child',
+          'callback': function(data) {
+            var tag = escapeHtml($(data.node).prop('outerHTML'));
+            if (data.type=='add') {
+              log('node has been added to a child element directly under self element. <br>tag: ' + tag);
+            } else if (data.type=='remove') {
+              log('node has been removed from a child element directly under self element. <br>tag:' + tag);
+            }
+          }
+        })
+        .observeNode({
+          'selector': '> .child *',
+          'callback': function(data) {
+            var tag = escapeHtml($(data.node).prop('outerHTML'));
+            if (data.type=='add') {
+              log('node has been added to a progeny element under a child element. <br>tag:' + tag);
+            } else if (data.type=='remove') {
+              log('node has been removed from a progeny element under a child element. <br>tag:' + tag);
+            }
+          }
+        });
+
+      var $self = $('.demo-box');
+      $('.change-node .apply').bind('click',function(){
+        var $parent = $(this).closest('.ctrl-box');
+        var type = $parent.find('.type').val();
+        var target = $parent.find('.target').val();
+
+        var $target;
+        var add_elm;
+        var rm_cls;
+        if (target=='self') {
+          $target = $self;
+          add_elm = '<div class="child"><label>child</label></div>';
+          rm_cls = '.child';
+        } else if (target=='child') {
+          $target = $self.find('.child');
+          add_elm = '<div class="grand-child"><label>grand child</label></div>';
+          rm_cls = '.grand-child';
+        } else if (target=='grand-child') {
+          $target = $self.find('.grand-child');
+          add_elm = '<div class="grand-grand-child"><label>grand grand child</label></div>';
+          rm_cls = '.grand-grand-child';
+        }
+        if (type=='add') {
+          var idx = Math.floor(Math.random()*$target.length);
+          $target.eq(idx).append(add_elm);
+        } else if (type=='remove') {
+          $rm = $target.find(rm_cls);
+          var idx = Math.floor(Math.random()*$rm.length);
+          $rm.eq(idx).remove();
+        }
+      });
+
+      $('.change-class .apply').bind('click',function(){
+        var $parent = $(this).closest('.ctrl-box');
+        var class_name = $parent.find('.class-name').val();
+        var target = $parent.find('.target').val();
+        
+        var $target;
+        if (target=='self') {
+          $target = $self;
+        } else if (target=="child") {
+          $target = $self.find('.child');
+        } else if (target=='grand-child') {
+          $target = $self.find('.grand-child');
+        } else if (target=='grand-grand-child') {
+          $target = $self.find('.grand-grand-child');
+        }
+        
+        $target.each(function(){
+          if (!$(this).hasClass(class_name)) {
+            $(this).addClass(class_name);
+            return false;
+          }
+        });
+      });
+
+      var $logs = $('.logs');
+      function log (msg) {
+        $logs.prepend('<li class="show">'+msg+'</li>');
+        if ($logs.find('li').length > 15) {
+          $logs.find('li').filter(':last-child').remove();
+        }
+        console.log(msg);
+      }
+
+      function escapeHtml(str){
+        if (!str) return null;
+        str = str.replace(/&/g, '&amp;');
+        str = str.replace(/>/g, '&gt;');
+        str = str.replace(/</g, '&lt;');
+        str = str.replace(/"/g, '&quot;');
+        str = str.replace(/'/g, '&#x27;');
+        str = str.replace(/`/g, '&#x60;');
+        return str;
+      }
+      </script>
+    </body>
+</html>
